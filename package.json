@@ -1,0 +1,27 @@
+{
+  "name": "webpack-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/webpack/bin/webpack.js --progress --colors --display-error-details"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.9.0",
+    "css-loader": "^0.9.1",
+    "extract-text-webpack-plugin": "^0.3.8",
+    "file-loader": "^0.8.1",
+    "handlebars": "^2.0.0",
+    "handlebars-loader": "^0.1.8",
+    "less": "^2.3.1",
+    "less-loader": "^2.0.0",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.8.3",
+    "webpack": "^1.5.3"
+  }
+}
