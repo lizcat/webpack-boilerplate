@@ -9,7 +9,6 @@ Simple production-ready boilerplate for [Webpack](http://webpack.github.io/) (Co
 * wraps the scripts and templates in common.js / AMD modules
 * concatenates scripts and styles
 * generates source maps for concatenated files
-* copies assets and static files
 * shrinks the output by minifying code and optimizing images
 * watches your files for changes
 * notifies you about errors via console

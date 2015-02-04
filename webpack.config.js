@@ -8,48 +8,52 @@ var lessSourceMap = (env != "production") ? "?sourceMap" : "";
 var hash = (env == "production") ? "[hash]" : "bundle";
 var templateParams = {env: env};
 
-var config = {
-  entry: {
-    index: "./app/bundles/index/initialize.coffee",
-    account: "./app/bundles/account/initialize.coffee"
-  },
+var config = function(name) {
+  var namePath = (name == 'index') ? "" : "/" + name;
+  var result = {
+    name: name,
+    entry: "./app/bundles/"+name+"/initialize.coffee",
 
-  output: {
-    path: __dirname + "/public",
-    filename: "assets/[name]-"+hash+".js",
-    chunkFilename: "assets/[id]-"+hash+".js",
-  },
+    output: {
+      path: __dirname + "/public" + namePath,
+      filename: "assets/[name]-"+hash+".js",
+      chunkFilename: "assets/[id]-"+hash+".js",
+    },
 
-  module: {
-    loaders: [
-      { test: /\.coffee$/, loader: "coffee-loader" },
-      { test: /\.hbs$/, loader: "handlebars-loader" },
-      // { test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader") },
-      { test: /\.less$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader"+lessSourceMap+"!less-loader") },
-      // { test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
-      { test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3|\.html$/, loader: "file-loader" },
+    module: {
+      loaders: [
+        { test: /\.coffee$/, loader: "coffee-loader" },
+        { test: /\.hbs$/, loader: "handlebars-loader" },
+        { test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader"+lessSourceMap) },
+        { test: /\.less$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader"+lessSourceMap+"!less-loader") },
+        { test: /\.jpe?g$|\.gif$|\.png$|\.svg$|\.woff$|\.ttf$|\.wav$|\.mp3|\.html$/, loader: "file-loader" },
+      ]
+    },
+
+    resolve: {
+      root: [__dirname + '/bower_components', __dirname + '/app'],
+      extensions: ["", ".web.coffee", ".web.js", ".coffee", ".js", ".hbs", ".less"]
+    },
+
+    plugins: [
+      new webpack.ResolverPlugin(new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin("bower.json", ["main"])),
+      new ExtractTextPlugin("assets/[name]-"+hash+".css"),
+      new HandlebarsHtmlPlugin({path: __dirname + '/app/bundles/'+name+'/assets', params: templateParams, name: name})
     ]
-  },
+  };
 
-  resolve: {
-    root: [__dirname + '/bower_components', __dirname + '/app'],
-    extensions: ["", ".web.coffee", ".web.js", ".coffee", ".js", ".hbs", ".ejs", ".less"]
-  },
+  if (env == 'production') {
+    result.plugins.push(new webpack.optimize.DedupePlugin());
+    result.plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
+  } else {
+    result.cache = true;
+    result.debug = true;
+    result.devtool = "source-map";
+  }
 
-  plugins: [
-    new webpack.ResolverPlugin(new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin("bower.json", ["main"])),
-    new ExtractTextPlugin("assets/[name]-"+hash+".css"),
-    new HandlebarsHtmlPlugin({path: __dirname + '/app/templates', params: templateParams})
-  ]
+  return result;
 };
 
-if (env == 'production') {
-  config.plugins.push(new webpack.optimize.DedupePlugin());
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
-} else {
-  config.cache = true;
-  config.debug = true;
-  config.devtool = "source-map";
-}
+var bundles = ['index', 'account'];
 
-module.exports = config;
+module.exports = bundles.map(function(item) {return config(item)});
